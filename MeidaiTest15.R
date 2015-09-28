@@ -3,9 +3,9 @@ library(e1071)
 library(data.table)
 old.op <- options(max.print=999999)
 
-meidai <- read.csv("Driving_data_list_20150418_editHSMT.csv", header=FALSE)
-feature <- as.matrix(meidai[1:500, 5:12])
-answer <- as.factor(meidai$V14[1:500]) #transfor boolian
+meidai <- read.csv("Driving_data_list_20150418_editHSMT_deleteNA.csv", header=FALSE)
+feature <- as.matrix(meidai[1:1847, 5:16])
+answer <- as.factor(meidai$V4[1:1847]) #transfor boolian
 MdataMT <- cbind(feature, answer)
 Mdata <- as.data.frame(MdataMT)
 result <- svm(answer~., Mdata, type="C-classification", cost=1,
@@ -13,12 +13,12 @@ result <- svm(answer~., Mdata, type="C-classification", cost=1,
 summary(result)
 
 #グリッドサーチ
-gammaRange = 10^(-5:2)
+gammaRange = 10^(-2:1)
 costRange = 10^(-1:4)
 ti <- proc.time() #計算前の時間
 t <- tune.svm(feature, answer, gamma=gammaRange, cost=costRange,
               tunecontrol = tune.control(sampling="cross", cross=12))
-proc.time()-ti#計算後の時間-計算前の時間=計算時間
+proc.time()-ti #計算後の時間-計算前の時間=計算時間
 cat("- best parameters:\n")
 cat("gamma =", t$best.parameters$gamma, "; cost =", t$best.parameters$cost, ";\n")
 cat("accuracy:", 100 - t$best.performance * 100, "%\n\n")
